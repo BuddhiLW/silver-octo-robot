@@ -1,0 +1,26 @@
+(ns acme.models.camera-model
+  (:require
+   [hti.re-dash :as rd]
+   [acme.api.albums :as api]))
+
+(defn register! []
+  (rd/reg-event-fx
+   ::init
+   (fn [_ _]
+     {::camera-state nil}))
+
+  (rd/reg-fx
+   ::camera-state
+   (fn [_]
+     (let [result (await (api/get-albums))]
+       (rd/dispatch [::populate-camera-state result]))))
+
+  (rd/reg-event-db
+   ::populate-camera-state
+   (fn [db [_ state]]
+     (assoc-in db [:camera :permissions] state)))
+
+  (rd/reg-sub
+   ::state
+   (fn [db _]
+     (:camera db nil))))

@@ -1,0 +1,19 @@
+(ns acme.api.albums
+  (:require
+   ["api_client.dart" :as api]
+   ["package:dio/dio.dart" :as dio]))
+
+(def ^:private base-url "https://jsonplaceholder.typicode.com/")
+(def ^:private dio-client (dio/Dio (dio/BaseOptions .baseUrl base-url .connectTimeout (Duration .seconds 5))))
+(def ^:private api-client (api/RestClient dio-client))
+
+(defn get-albums
+  "Call http for /albums
+     The argument page should be a number.
+     **Usage**
+     ```clojure
+     :watch [response (get-album)];; You get a list of Album
+     ```
+"
+  ([]
+   (-> api-client .getAlbums)))

@@ -1,0 +1,81 @@
+(ns acme.pages.camera
+  (:require
+   ;; Flutter imports
+   ["package:flutter/material.dart" :as m]
+   ;; Mobile Scanner imports
+   ["package:mobile_scanner/mobile_scanner.dart" :as ms]
+   ;; The ClojureDart Flutter interop library
+   [cljd.flutter :as f]))
+
+;; A small helper function to build the Text widget for the scanned barcode.
+(defn build-barcode [^ms/Barcode? barcode]
+  (if (nil? barcode)
+    (m/Text "Scan something!"
+            .overflow m/TextOverflow.fade
+            .style (m/TextStyle .color m/Colors.white))
+    (m/Text (or (.-displayValue barcode) "No display value.")
+            .overflow m/TextOverflow.fade
+            .style (m/TextStyle .color m/Colors.white))))
+
+(defonce app-state (atom {:barcode nil}))
+
+(defn handle-barcode [^ms/BarcodeCapture capture]
+  ;; `capture` is a BarcodeCapture object.
+  ;; `capture.barcodes` is a Dart List<Barcode>.
+  (when-let [barcodes (.-barcodes capture)]
+            ;; Check if the list is not empty; if so, take the first element.
+    (let [first-barcode (when (pos? (count barcodes))
+                          (aget barcodes 0))]
+      (swap! app-state update :barcode (constantly first-barcode)))))
+
+(def main
+  (f/widget
+   :watch [{:keys [barcode]} app-state]
+   (m/Scaffold
+    .appBar
+    (m/AppBar
+     .title (m/Text "Simple scanner"))
+      ;; Set the background color to black
+    .backgroundColor m/Colors.black
+      ;; The main body of the screen
+    .body
+    (m/Stack
+     .children
+     [(ms/MobileScanner
+       :onDetect
+       (fn [capture] (handle-barcode capture)))
+      (m/Align
+       .alignment m/Alignment.bottomCenter
+       .child
+       (m/Container
+        .alignment m/Alignment.bottomCenter
+        .height 100
+        .color (.withOpacity m/Colors.black 0.4)
+        .child
+        (m/Row
+         .mainAxisAlignment m/MainAxisAlignment.spaceEvenly
+         .children
+         [(m/Expanded
+           .child
+           (m/Center
+            .child
+              ;; Display the scanned barcode text here
+            (build-barcode barcode)))])))]))))
+
+;; (defn view []
+;;   ;; (rd/dispatch [::albums-model/refresh-albums])
+;;   (rd/dispatch [::camera-model/init])
+;;   (f/widget
+;;    :watch [camera (rd/subscribe [::camera-model/state])] ; Here subscribe to `get-albums`
+;;    (if-some [{} albums]
+;;      ;; (build-list-items albums)
+;;      (m/CircularProgressIndicator))))
+
+;; (def main
+;;   (f/widget
+;;    (m/Scaffold
+;;     .appBar (m/AppBar .title (m/Text "QRCode Scanner"))
+;;     .body
+;;     (m/Center
+;;      .child))))
+;;      ;; (albums-list/view)))))

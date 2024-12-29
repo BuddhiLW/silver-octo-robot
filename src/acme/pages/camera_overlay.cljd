@@ -1,0 +1,153 @@
+(ns acme.pages.camera-overlay
+  (:require
+   ;; Flutter
+   ["package:flutter/material.dart" :as m]
+   ;; Mobile Scanner
+   ["package:mobile_scanner/mobile_scanner.dart" :as ms]
+   ;; Example library widgets (adjust these imports to match your project)
+   ["package:mobile_scanner_example/scanned_barcode_label.dart" :as sbl]
+   ["package:mobile_scanner_example/scanner_button_widgets.dart" :as sbw]
+   ["package:mobile_scanner_example/scanner_error_widget.dart" :as sew]
+   ;; ClojureDart Flutter interop
+   [cljd.flutter :as f]
+   [cljd.core :refer [this]]))
+
+;;------------------------------------------------------------------------------
+;; Custom Painter for Drawing the Overlay
+;;------------------------------------------------------------------------------
+
+#_(defn scanner-overlay [scan-window border-radius]
+    (f/create-custom-painter
+     :paint
+     (fn [canvas size]
+       (let [; Create a Path covering the entire screen.
+             background-path (doto (m/Path.)
+                               (.addRect (m/Rect.fromLTWH 0 0 (.-width size) (.-height size))))
+
+              ; Create a rounded rectangle path for the scan window cutout.
+             border-rect (m/RRect.fromRectAndCorners
+                          scan-window
+                          :topLeft (m/Radius.circular border-radius)
+                          :topRight (m/Radius.circular border-radius)
+                          :bottomLeft (m/Radius.circular border-radius)
+                          :bottomRight (m/Radius.circular border-radius))
+
+             cutout-path (doto (m/Path.)
+                           (.addRRect border-rect))
+
+              ; Paint for darkening everything outside the scan window.
+             background-paint (doto (m/Paint.)
+                                (set! (.-color) (-> m/Colors .-black (.withOpacity 0.5)))
+                                (set! (.-style) m/PaintingStyle.fill)
+                                (set! (.-blendMode) m/BlendMode.dstOver))
+
+              ; Combine the full background path with the cutout path
+              ; to subtract the scan window area.
+             background-with-cutout (m/Path.combine
+                                     m/PathOperation.difference
+                                     background-path
+                                     cutout-path)
+
+              ; Paint for the white border around the scan window.
+             border-paint (doto (m/Paint.)
+                            (set! (.-color) m/Colors.white)
+                            (set! (.-style) m/PaintingStyle.stroke)
+                            (set! (.-strokeWidth) 4.0))]
+
+          ;; Draw the darkened background with the hole for the scan window
+         (.drawPath canvas background-with-cutout background-paint)
+
+          ;; Draw the border on the scan window
+         (.drawRRect canvas border-rect border-paint)))
+     :shouldRepaint
+     (fn [old-delegate]
+       (or (not= scan-window (.-scanWindow old-delegate))
+           (not= border-radius (.-borderRadius old-delegate))))
+     :scanWindow scan-window
+     :borderRadius border-radius))
+
+;;------------------------------------------------------------------------------
+;; A Stateful Widget for the Barcode Scanner With Overlay
+;;------------------------------------------------------------------------------
+
+#_(defn barcode-scanner-with-overlay []
+    ;; Use `f/stateful` to replicate the `StatefulWidget` + `State` logic.
+    (f/widget
+     :context context
+     :let [controller (ms/MobileScannerController.
+                       .formats [ms/BarcodeFormat.qrCode])
+            ;; Provide a dispose function to clean up the controller.
+           dispose-fn (fn []
+                        (.dispose controller))
+           size (m/MediaQuery.sizeOf context)
+           center (.center size (m/Offset.zero))
+           scan-window (m/Rect.fromCenter
+                        :center center
+                        :width 200
+                        :height 200)]
+     (m/Scaffold
+           ;; Background color
+      .backgroundColor m/Colors.black
+
+           ;; AppBar
+      .appBar
+      (m/AppBar
+       .title (m/Text "Scanner with Overlay Example app"))
+
+           ;; Body
+      .body
+      (m/Stack
+       .fit m/StackFit.expand
+       .children
+       [(m/Center
+         .child
+         (ms/MobileScanner
+          :fit m/BoxFit.contain
+          :controller controller
+          :scanWindow scan-window
+          :errorBuilder
+          (fn [context error child]
+            (sew/ScannerErrorWidget :error error))
+          :overlayBuilder
+          (fn [context constraints]
+            (m/Padding
+             .padding (m/EdgeInsets.all 16.0)
+             .child
+             (m/Align
+              .alignment m/Alignment.bottomCenter
+              .child
+                   ;; Display the scanned barcodes
+              (sbl/ScannedBarcodeLabel :barcodes (.-barcodes controller)))))))
+
+             ;; ValueListenableBuilder - hides or shows the overlay based on state
+        (m/ValueListenableBuilder
+         :valueListenable controller
+         :builder
+         (fn [context value child]
+           (if (or (not (.-isInitialized value))
+                   (not (.-isRunning value))
+                   (some? (.-error value)))
+                  ;; If the scanner isn't ready or has error, hide the overlay
+             (m/SizedBox)
+                  ;; Else, paint our custom overlay
+             (m/CustomPaint
+              .painter (scanner-overlay scan-window 12.0)))))
+
+             ;; Bottom row of flashlight toggle and camera switch
+        (m/Align
+         .alignment m/Alignment.bottomCenter
+         .child
+         (m/Padding
+          .padding (m/EdgeInsets.all 16.0)
+          .child
+          (m/Row
+           .mainAxisAlignment m/MainAxisAlignment.spaceEvenly
+           .children
+           [(sbw/ToggleFlashlightButton :controller controller)
+            (sbw/SwitchCameraButton :controller controller)])))]))
+
+       ;; Attach dispose function here so it’s called when widget is removed.
+     :dispose dispose-fn))
+
+;; If you wish, you can export a `main` function (entry point):
+#_(def main (barcode-scanner-with-overlay))
