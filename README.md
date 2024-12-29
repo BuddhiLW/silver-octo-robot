@@ -25,7 +25,5 @@ Can show you which ones are available.
 
 ## Showcase
 
-
-
-https://github.com/user-attachments/assets/58ceaf38-5c17-4f05-b829-dcada622a60d
+<video src="./demo.mp4" width="600" height="300" controls></video>
 
