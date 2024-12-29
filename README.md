@@ -1,16 +1,24 @@
-# cljd_hello
+# silver-octo-robot
 
-A new Flutter project.
+Project with multiple public available, and others not, samples. All integrated in one app.
+
+Here you will find examples of:
+- Routing;
+- Re-dash vs atom-based states;
+- Camera usage to scan barcodes (qrcodes, etc.);
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To kick off the project:
 
-A few resources to get you started if this is your first Flutter project:
+``` sh
+clj -M:cljd flutter
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+If you want to run a simulator, you have to do it, before running this command. To specify a device, add `-d <device-id>`
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+``` sh
+flutter devices
+```
+
+Can show you which ones are available.
