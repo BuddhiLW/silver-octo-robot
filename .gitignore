@@ -11,6 +11,19 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
+linux/
+windows/
+web/
+macos/
+ios/
+android/
+build/
+.dart_tool/
+.idea/
+.lsp/
+.cpcache/
+.clojuredart/
+.clj-kondo/
 
 # IntelliJ related
 *.iml
