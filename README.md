@@ -25,5 +25,5 @@ Can show you which ones are available.
 
 ## Showcase
 
-<video src="./demo.mp4" width="600" height="300" controls></video>
+<video src="https://github.com/BuddhiLW/silver-octo-robot/blob/main/demo.mp4" width="600" height="300" controls></video>
 
