@@ -3,20 +3,23 @@
   (:require
    ["package:flutter/material.dart" :as m]
    [cljd.flutter :as f]
-   [acme.pages.animated-container :as animated]
-   [acme.pages.album :as album]
+   ;; [acme.pages.animated-container :as animated]
+   ;; [acme.pages.album :as album]
+   ;; [acme.pages.lab :as lab]
+   [acme.pages.routing.apps :as apps]
    [acme.models.albums-model :as albums-model]
-   [acme.pages.lab :as lab]
+   [acme.models.apps-model :as apps-model]
    [acme.pages.camera :as camera]))
 
 (defn main
   []
   (albums-model/register!)
+  (apps-model/register!)
   (let [title "Examples & Samples"
-        pages [animated/main
+        pages [;;animated/main
                camera/main
-               ;; album/main
-               lab/main]
+               apps/main]
+               ;;lab/main]
         selected-index (atom 0)]
     (f/run
      (m/MaterialApp .title title)
@@ -33,17 +36,17 @@
        :watch [current-index selected-index]
        (m/BottomNavigationBar
         ;;(m/Icon. m/Icons.directions_car)
-        .items [(m/BottomNavigationBarItem
-                 .icon (m/Text "⬛")
-                 .label "Animation")
+        .items [#_(m/BottomNavigationBarItem
+                   .icon (m/Text "⬛")
+                   .label "Animation")
                 (m/BottomNavigationBarItem
                  .icon  (m/Text "📷")
                  .label "QRCode Scan")
-                #_(m/BottomNavigationBarItem
-                   .icon  (m/Text "🛤🛣");; (m/Icon. m/Icons.directions_transit)
-                   .label "API & Routing")
                 (m/BottomNavigationBarItem
-                 .icon  (m/Text "📚")
-                 .label "First App")]
+                 .icon  (m/Text "🛤🛣");; (m/Icon. m/Icons.directions_transit)
+                 .label "API & Routing")
+                #_(m/BottomNavigationBarItem
+                   .icon  (m/Text "📚")
+                   .label "First App")]
         .currentIndex current-index
         .onTap (fn [index] (reset! selected-index index))))))))

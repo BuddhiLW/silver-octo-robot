@@ -1,0 +1,49 @@
+(ns acme.models.apps-model
+  (:require
+   [hti.re-dash :as rd]
+   [acme.pages.album :as album]
+   [acme.pages.animated-container :as animated]
+   [acme.pages.lab :as lab]
+   [acme.pages.camera :as camera]))
+
+(def apps-state
+  {:current nil
+   :data {:albums-list {:title "Fetch Albums List from API"
+                        :state nil
+                        :main album/main}
+          :animated-frame {:title "Animated Frame"
+                           :state nil
+                           :main animated/main}
+          :lab {:title "First Application Lab (TL)"
+                :state nil
+                :main lab/main}
+          :camera {:title "Simple Camera as a Scanner (TL)"
+                   :state nil
+                   :main camera/main}}})
+
+(defn register! []
+  (rd/reg-event-fx
+   ::refresh-apps
+   (fn [_ _]
+     {::fetch-apps nil})) ; Trigger API fetch
+
+  (rd/reg-fx
+   ::fetch-apps
+   (fn [_]
+     (let [result apps-state]
+       (rd/dispatch [::populate-apps result])))) ; Simulate API call
+
+  (rd/reg-event-db
+   ::populate-apps
+   (fn [db [_ apps-state]]
+     (assoc db :apps apps-state))) ; Populate the app state
+
+  (rd/reg-sub
+   ::get-all-apps
+   (fn [db _]
+     (get-in db [:apps :data]))) ; Fetch all apps
+
+  (rd/reg-sub
+   ::get-app
+   (fn [db [_ id]]
+     (get-in db [:apps :data id])))) ; Fetch a specific app

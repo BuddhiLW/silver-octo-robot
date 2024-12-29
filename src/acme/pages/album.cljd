@@ -2,12 +2,6 @@
   (:require
    [acme.pages.album-list :as albums-list]
    ["package:flutter/material.dart" :as m]))
-;;
-;; [cljd.flutter :as f]))
-
-;;
-;;
-;;
 
 (def main
   (m/Scaffold

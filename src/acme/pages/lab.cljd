@@ -71,6 +71,7 @@
   [constraints]
   (f/widget
    :get {{{:flds [onPrimaryContainer]} .-colorScheme} m/Theme}
+   :get [m/Navigator] ; Obtain Navigator
    :watch [{:keys [selected-index]} app-state]
    m/Row
    .children
@@ -112,3 +113,9 @@
               .builder
               (f/build [constraints]
                        (lateral-bar constraints))))))))
+
+;; :context context
+;; :let [navigator (m/Navigator.of context)])) ; Obtain Navigator
+;; (m/ElevatedButton
+;;      :onPressed #(.pop navigator)
+;;      .child (m/Text "Go back!"))

@@ -1,0 +1,12 @@
+(ns acme.pages.routing.apps
+  (:require
+   [acme.pages.routing.apps-list :as apps-list]
+   ["package:flutter/material.dart" :as m]))
+
+(def main
+  (m/Scaffold
+   .appBar (m/AppBar .title (m/Text "List all Apps"))
+   .body
+   (m/Center
+    .child
+    (apps-list/view))))

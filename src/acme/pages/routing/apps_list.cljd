@@ -1,0 +1,45 @@
+(ns acme.pages.routing.apps-list
+  (:require
+   ["package:flutter/material.dart" :as m]
+   [hti.re-dash :as rd]
+   [cljd.flutter :as f]
+   [acme.models.apps-model :as apps-model]
+   ["list_view_refreshable.dart" :as ext-refresh]
+   [acme.pages.routing.apps-details :as apps-details]))
+
+(defn- navigate [navigator page name]
+  (.push
+   navigator
+   (m/MaterialPageRoute
+    .settings (m/RouteSettings :name name)
+    .builder (f/build page))))
+
+(defn- list-view-apps [apps navigator]
+  (let [apps-list (vec (map (fn [[id data]] {:id id :data data}) apps))] ; Convert map to vector of key-value pairs
+    (m/ListView.builder
+     :itemCount (count apps-list)
+     :itemBuilder
+     (f/build
+      [idx]
+      (let [{:keys [id _]} (nth apps-list idx)]
+        (m/ListTile
+         :title (m/Text (str "App: " (name id)))
+         :onTap (fn [] (navigate navigator
+                                 (apps-details/view id)
+                                 (str "Details-" id)))))))))
+
+(defn- build-list-items [apps navigator]
+  (-> (list-view-apps apps navigator)
+      ext-refresh/ListViewRefreshable
+      (.refreshable
+       #(rd/dispatch [::apps-model/refresh-apps])))) ; Dispatch refresh action
+
+(defn view []
+  (rd/dispatch [::apps-model/refresh-apps]) ; Initial fetch
+  (f/widget
+   :watch [apps (rd/subscribe [::apps-model/get-all-apps])] ; Subscribe to all apps
+   (if (seq apps)
+     (f/widget
+      :get [m/Navigator]
+      (build-list-items apps navigator))
+     (m/CircularProgressIndicator))))

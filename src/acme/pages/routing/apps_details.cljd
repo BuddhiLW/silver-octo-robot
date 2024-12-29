@@ -1,0 +1,19 @@
+(ns acme.pages.routing.apps-details
+  (:require
+   ["package:flutter/material.dart" :as m]
+   [cljd.flutter :as f]
+   [hti.re-dash :as rd]
+   [acme.models.apps-model :as apps-model]))
+
+(ns acme.pages.routing.apps-details
+  (:require
+   ["package:flutter/material.dart" :as m]
+   [cljd.flutter :as f]
+   [hti.re-dash :as rd]
+   [acme.models.apps-model :as apps-model]))
+(defn view [app-id]
+  (f/widget
+   :watch [{:keys [title state main]} (rd/subscribe [::apps-model/get-app app-id])]
+   .child
+   main))
+
