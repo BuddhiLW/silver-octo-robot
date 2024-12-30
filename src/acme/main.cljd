@@ -3,22 +3,22 @@
   (:require
    ["package:flutter/material.dart" :as m]
    [cljd.flutter :as f]
-   ;; [acme.pages.animated-container :as animated]
    ;; [acme.pages.album :as album]
    ;; [acme.pages.lab :as lab]
+   ;; [acme.pages.camera :as camera]))
    [acme.pages.routing.apps :as apps]
    [acme.models.albums-model :as albums-model]
    [acme.models.apps-model :as apps-model]
-   [acme.pages.camera :as camera]))
+   [acme.pages.animated-container :as animated]))
 
 (defn main
   []
   (albums-model/register!)
   (apps-model/register!)
   (let [title "Examples & Samples"
-        pages [;;animated/main
-               camera/main
+        pages [animated/main
                apps/main]
+               ;; camera/main
                ;;lab/main]
         selected-index (atom 0)]
     (f/run
@@ -36,12 +36,12 @@
        :watch [current-index selected-index]
        (m/BottomNavigationBar
         ;;(m/Icon. m/Icons.directions_car)
-        .items [#_(m/BottomNavigationBarItem
-                   .icon (m/Text "⬛")
-                   .label "Animation")
-                (m/BottomNavigationBarItem
-                 .icon  (m/Text "📷")
-                 .label "QRCode Scan")
+        .items [(m/BottomNavigationBarItem
+                 .icon (m/Text "⬛")
+                 .label "Animation")
+                #_(m/BottomNavigationBarItem
+                   .icon  (m/Text "📷")
+                   .label "QRCode Scan")
                 (m/BottomNavigationBarItem
                  .icon  (m/Text "🛤🛣");; (m/Icon. m/Icons.directions_transit)
                  .label "API & Routing")

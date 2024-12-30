@@ -4,22 +4,32 @@
    [acme.pages.album :as album]
    [acme.pages.animated-container :as animated]
    [acme.pages.lab :as lab]
-   [acme.pages.camera :as camera]))
+   [acme.pages.camera :as camera]
+   [acme.pages.signin.view :as signin]
+   [acme.pages.signup.view :as signup]))
 
+;; Initial state
 (def apps-state
   {:current nil
-   :data {:albums-list {:title "Fetch Albums List from API"
-                        :state nil
-                        :main album/main}
-          :animated-frame {:title "Animated Frame"
-                           :state nil
-                           :main animated/main}
-          :lab {:title "First Application Lab (TL)"
-                :state nil
-                :main lab/main}
-          :camera {:title "Simple Camera as a Scanner (TL)"
-                   :state nil
-                   :main camera/main}}})
+   :data    {:albums-list    {:title "Fetch Albums List from API"
+                              :state nil
+                              :main  album/main}
+             :animated-frame {:title "Animated Frame"
+                              :state nil
+                              :main  animated/main}
+             :lab            {:title "First Application Lab (TL)"
+                              :state nil
+                              :main  lab/main}
+             :camera         {:title "Simple Camera as a Scanner (TL)"
+                              :state nil
+                              :main  camera/main}
+             :signup         {:title "Sign-up Page (TL)"
+                              :state nil
+                              :main  signup/main}
+             :signin         {:title "Sign-in Page (TL)"
+                              :state nil
+                              :main  signin/main}}})
+;;
 
 (defn register! []
   (rd/reg-event-fx
